@@ -9,7 +9,8 @@ import subprocess
 import sys
 
 script_dir = os.getcwd()
-conda_env_path = os.path.join(script_dir, "installer_files", "env")
+conda_env_path = os.environ['INSTALL_ENV_TGWUI']
+# conda_env_path = os.path.join(script_dir, "installer_files", "env")
 
 # Remove the '# ' from the following lines as needed for your AMD GPU on Linux
 # os.environ["ROCM_PATH"] = '/opt/rocm'
@@ -139,10 +140,11 @@ def run_cmd(cmd, assert_success=False, environment=False, capture_output=False, 
     # Use the conda environment
     if environment:
         if is_windows():
-            conda_bat_path = os.path.join(script_dir, "installer_files", "conda", "condabin", "conda.bat")
+            conda_bat_path = os.path.join(os.environ['INSTALL_DIR'], "\\anaconda3", "condabin", "conda.bat")
+            # conda_bat_path = os.path.join(script_dir, "..", "anaconda3", "condabin", "conda.bat")
             cmd = "\"" + conda_bat_path + "\" activate \"" + conda_env_path + "\" >nul && " + cmd
         else:
-            conda_sh_path = os.path.join(script_dir, "installer_files", "conda", "etc", "profile.d", "conda.sh")
+            conda_sh_path = os.path.join(script_dir, "anaconda3", "etc", "profile.d", "conda.sh")
             cmd = ". \"" + conda_sh_path + "\" && conda activate \"" + conda_env_path + "\" && " + cmd
 
     # Run shell commands
@@ -367,7 +369,7 @@ def launch_webui():
 
 if __name__ == "__main__":
     # Verifies we are in a conda environment
-    check_env()
+    # check_env()
 
     parser = argparse.ArgumentParser(add_help=False)
     parser.add_argument('--update', action='store_true', help='Update the web UI.')

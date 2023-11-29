@@ -13,19 +13,18 @@ echo "%CD%"| findstr /R /C:"[!#\$%&()\*+,;<=>?@\[\]\^`{|}~]" >nul && (
 )
 set SPCHARMESSAGE=
 
+
 @rem fix failed install when installing to a separate drive
 set TMP=%cd%\installer_files
 set TEMP=%cd%\installer_files
 
 @rem deactivate existing conda envs as needed to avoid conflicts
-(call conda deactivate && call conda deactivate && call conda deactivate) 2>nul
 
-@rem config
-set INSTALL_DIR=%cd%\installer_files
-set CONDA_ROOT_PREFIX=%cd%\installer_files\conda
-set INSTALL_ENV_DIR=%cd%\installer_files\env
+@rem Pulling Directory setting json, parsing and setting the directory variables.
+
 set MINICONDA_DOWNLOAD_URL=https://repo.anaconda.com/miniconda/Miniconda3-py310_23.3.1-0-Windows-x86_64.exe
 set conda_exists=F
+
 
 @rem figure out whether git and conda needs to be installed
 call "%CONDA_ROOT_PREFIX%\_conda.exe" --version >nul 2>&1
@@ -48,23 +47,24 @@ if "%conda_exists%" == "F" (
 )
 
 @rem create the installer env
-if not exist "%INSTALL_ENV_DIR%" (
+if not exist "%INSTALL_ENV_TGWUI%" (
 	echo Packages to install: %PACKAGES_TO_INSTALL%
-	call "%CONDA_ROOT_PREFIX%\_conda.exe" create --no-shortcuts -y -k --prefix "%INSTALL_ENV_DIR%" python=3.11 || ( echo. && echo Conda environment creation failed. && goto end )
+	call "%CONDA_ROOT_PREFIX%\_conda.exe" create --no-shortcuts -y -k --prefix "%INSTALL_ENV_TGWUI%" python=3.11 || ( echo. && echo Conda environment creation failed. && goto end )
 )
 
 @rem check if conda environment was actually created
-if not exist "%INSTALL_ENV_DIR%\python.exe" ( echo. && echo Conda environment is empty. && goto end )
+
+@rem if not exist "%INSTALL_DIR%\python.exe" ( echo. && echo Conda environment is empty. && goto end )
 
 @rem environment isolation
 set PYTHONNOUSERSITE=1
 set PYTHONPATH=
 set PYTHONHOME=
-set "CUDA_PATH=%INSTALL_ENV_DIR%"
+set "CUDA_PATH=%INSTALL_ENV_TGWUI%"
 set "CUDA_HOME=%CUDA_PATH%"
 
 @rem activate installer env
-call "%CONDA_ROOT_PREFIX%\condabin\conda.bat" activate "%INSTALL_ENV_DIR%" || ( echo. && echo Miniconda hook not found. && goto end )
+@rem call "%CONDA_ROOT_PREFIX%\condabin\conda.bat" activate "%INSTALL_ENV_TGWUI%" || ( echo. && echo Miniconda hook not found. && goto end )
 
 @rem setup installer env
 call python one_click.py %*
